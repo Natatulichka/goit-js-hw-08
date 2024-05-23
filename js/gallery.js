@@ -63,32 +63,71 @@ const images = [
     description: "Lighthouse Coast Sea",
   },
 ];
+// Визначити спільного предка групи елементів для відстеження подій.
 const gallery = document.querySelector(".gallery");
 
-function galleryItem(obj) {
+// Створюємо розмітку. спочатку одну <li></li>, потім масив.
+function galleryItem(image) {
   return `<li class="gallery-item">
-  <a class="gallery-link" href="${obj.original}">
+  <a class="gallery-link" href="${image.original}">
     <img
       class="gallery-image"
-      src="${obj.preview}"
-      data-source="${obj.original}"
-      alt="${obj.description}"width = "360" height = "300"
+      src="${image.preview}"
+      data-source="${image.original}"
+      alt="${image.description}"width = "360" height = "300"
     />
   </a>
 </li>`;
 }
 function galleryItems(arr) {
-  return arr.map(galleryItem).join("\n");
+  return arr.map(galleryItem).join(" ");
 }
 
 const markup = galleryItems(images);
+// Додаємо створену розмітку в DOM
 gallery.innerHTML = markup;
-
-imageGallery.addEventListener("click", selectImage);
+// Делегування
+//Зареєструвати на елементі-предку обробник події, яку ми хочемо відловлювати з групи елементів.
+gallery.addEventListener("click", selectImage);
+// В обробнику використовувати event.target для вибору цільового елемента, на якому безпосередньо відбулась подія.
+// import * as basicLightbox from "basiclightbox";
 function selectImage(event) {
-  if (event.target.nodeName !== "a") {
+  if (event.target === event.currentTarget) {
     return;
+    // користувач клікнув між кнопками
   }
+  const selectedImage = event.target.closest("IMG");
+  const source = selectedImage.dataset.source;
+  const image = images.find((el) => el.original == source);
+  console.log(source);
+  console.log(image);
+  showModal(image);
+}
+function showModal(image) {
+  const markup = `<li class="gallery-item">
+  <a class="gallery-link" href="${image.original}">
+    <img
+      class="gallery-image"
+      src="${image.preview}"
+      data-source="${image.original}"
+      alt="${image.description}"width="800" height="600"
+    />
+  </a>
+</li>`;
 
-  const selectedImage = event.target.dataset.source;
+  const instance = basicLightbox.create(markup, {
+    onShow: (instance) => {
+      window.addEventListener("keydown", onModalClose);
+    },
+    onClose: (instance) => {
+      window.removeEventListener("keydown", onModalClose);
+    },
+  });
+  instance.show();
+
+  function onModalClose(e) {
+    if (e.code === "Escape") {
+      instance.close();
+    }
+  }
 }
