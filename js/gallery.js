@@ -110,7 +110,7 @@ function showModal(image) {
       class="gallery-image"
       src="${image.preview}"
       data-source="${image.original}"
-      alt="${image.description}"width="800" height="600"
+      alt="${image.description}"width="1112" height="640"
     />
   </a>
 </li>`;
